@@ -7,21 +7,22 @@ remove-js:
 deps:
 	@test `which coffee` || echo 'You need to have CoffeeScript in your PATH.\nPlease install it using `brew install coffee-script` or `npm install coffee-script`.'
 
-publish: generate-js
-	@test `which npm` || echo 'You need npm to do npm publish... makes sense?'
+publish: generate-js has-npm
 	npm publish
-	@remove-js
+	@$(MAKE) remove-js
 
-link: generate-js
-	@test `which npm` || echo 'You need npm to do npm link... makes sense?'
+link: generate-js has-npm
 	npm link
-	@remove-js
+	@$(MAKE) remove-js
 
 dev: generate-js
 	@coffee -wc --no-wrap -o lib src/*.coffee
+
+has-npm:
+	@test `which npm` || echo 'You need npm installed for this command'
 
 install: generate-js
 
 clean: remove-js
 
-.PHONY: all
+.PHONY: generate-js remove-js deps publish link dev has-npm install clean
