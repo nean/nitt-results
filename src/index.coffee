@@ -4,10 +4,10 @@ Q = require 'q'
 
 url = 'http://www.nitt.edu/prm/nitreg/ShowRes.aspx'
 
-_defaultSemesters = [{
+_defaultSemesters = [
   code: 'latest'
   name: 'Most Recent Examination'
-}]
+]
 
 getViewState = (body)->
   body.match(/name="__VIEWSTATE" value="(.+?)"/)[1]
@@ -16,23 +16,20 @@ hasResult = (body)->
   null isnt body.match /LblGPA/
 
 doInitialRequest = (rollno)->
-  (request {
+  (request
     method: 'GET'
     uri: url
-  })
+  )
   .then (response)->
-    request {
+    request
       method: 'POST'
       uri: url
-      form: {
+      form:
         TextBox1: rollno
         Button1: 'Show'
         __VIEWSTATE: getViewState response.body
-      }
-      headers: {
+      headers:
         Referer: url
-      }
-    }
 
 getResultCallback = (rollno, sem)->
   (arr)->
@@ -40,20 +37,18 @@ getResultCallback = (rollno, sem)->
     response = arr[1]
     if sem is 'latest'
       sem = resultOptions[resultOptions.length - 1].code
-    (request {
+    (request
       method: 'POST'
       uri: url
-      form: {
+      form:
         TextBox1: rollno
         Dt1: sem
         __VIEWSTATE: getViewState response.body
         __EVENTTARGET: 'Dt1'
         __EVENTARGUMENT: ''
-      }
-      headers: {
+      headers:
         Referer: url
-      }
-    })
+    )
     .then (response)->
       jsonizeResults response, sem, resultOptions
 
@@ -74,10 +69,10 @@ common = (rollno, sem)->
 
     while match = optionsRegex.exec response.body
       if '0' isnt match[1]
-        resultOptions.push {
+        resultOptions.push
           code: match[1]
           name: match[2]
-        }
+
     if resultOptions.length is 0 and hasResult response.body
       firstYearHack = true
       sem = 'Unknown'
@@ -89,7 +84,7 @@ common = (rollno, sem)->
   promise.then getResultCallback rollno, sem
 
 jsonizeResults = (response, sem, otherSems)->
-  $ = cheerio.load response.body, {ignoreWhitespace: true}
+  $ = cheerio.load response.body, ignoreWhitespace: true
 
   ($ '#Dt1 option').each (i, elem)->
     if ($ this).attr('selected') isnt 'selected'
@@ -99,33 +94,32 @@ jsonizeResults = (response, sem, otherSems)->
   if sem is undefined
     sem = 'latest'
 
-  data = {
+  data =
     name: ($ '#LblName b font').text()
     rollno: ($ '#LblEnrollmentNo b font').text()
-    credits: {
+    credits:
       total: ($ '#LblRegCr b font').text()
       earned: ($ '#LblErCr b font').text()
-    }
     gpa: ($ '#LblGPA b font').text()
     exam: ($ '#LblExamName b font').text()
     semesterCode: sem
     semsters: otherSems
     courses: []
-  }
+
   ($ '#DataGrid1 tr').each (i, elem)->
     if (($ this).attr 'class') is 'DataGridHeader'
       return
     fontTags = $ 'td font', $(this).toString()
-    data.courses.push {
+    data.courses.push
       code: ($ fontTags[1]).text()
       name: ($ fontTags[2]).text()
       credits: ($ fontTags[3]).text()
       grade: ($ fontTags[4]).text()
       attendence: ($ fontTags[5]).text()
-    }
+
   data
 
-module.exports = {
+module.exports =
   getResult: (rollno, sem)->
     (common rollno, sem)
   getSems: (rollno)->
@@ -147,4 +141,3 @@ module.exports = {
       Q.all promiseList
   getLatestResult: (rollno)->
     module.exports.getResult(rollno, 'latest')
-}
