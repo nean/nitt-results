@@ -2,9 +2,7 @@
   "name": "nitt-results",
   "version": "0.1.0",
   "license": "MIT",
-
   "author": "Neranjen M V <mvneranjen@gmail.com>",
-
   "description": "NIT Trichy result scraper",
   "homepage": "https://github.com/nean/nitt-results",
   "keywords": [
@@ -14,7 +12,6 @@
     "result",
     "exam"
   ],
-
   "engines": {
     "node": ">= 0.8.0"
   },
@@ -23,13 +20,15 @@
     "lib": "./lib"
   },
   "dependencies": {
-    "q": ">=0.9.0",
-    "cheerio": ">=0.11.0",
-    "request": ">=2.20.0"
+    "q": "^1.1.2",
+    "cheerio": "^0.18.0",
+    "request": "^2.51.0"
   },
-
   "repository": {
-    "type"    : "git",
-    "url"     : "https://github.com/nean/nitt-results.git"
+    "type": "git",
+    "url": "https://github.com/nean/nitt-results.git"
+  },
+  "devDependencies": {
+    "which": "^1.0.8"
   }
 }
