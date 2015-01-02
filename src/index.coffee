@@ -1,4 +1,8 @@
-request = require './request-as-promised'
+request = require 'request'
+request = request.defaults
+  jar: true
+promisify = require './request-as-promised'
+request = promisify request
 cheerio = require 'cheerio'
 Q = require 'q'
 
